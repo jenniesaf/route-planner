@@ -7,11 +7,20 @@ A modern, scalable route planner for tourists in Montenegro, built with Next.js,
 ## 🎯 Core Idea
 
 A one-page web app that allows tourists to:
-- Select trip parameters
-- Build a custom route from predefined destinations
-- Ensure the route is feasible (time ≤ 10–12h)
-- Get price estimation
-- Submit booking request
+- Plan **single-day or multi-day trips** in Montenegro
+- Select trip parameters (passengers, starting point, **ending point**, activities)
+- Build custom routes from predefined destinations via interactive map
+- See **live preview** of each day's itinerary
+- Ensure each day is feasible (≤ 10–12 hours)
+- Get price estimation per day and total
+- Submit booking request for entire trip
+
+### Multi-Day Trip Support
+- **Day trips**: Each day has a start point and end point
+- **Flexible routing**: Day 1 can end in a different city than it started
+- **Efficient planning**: Day 2 starts where Day 1 ended (no backtracking)
+- **Automatic progression**: Completing Day 1 automatically enables Day 2 planning
+- **Visual preview**: See each day's route before confirming
 
 ---
 
@@ -61,14 +70,18 @@ A one-page web app that allows tourists to:
      - Zipline (1-2 hours)
 
 3. Create `src/data/startingPoints.ts`:
-   - Export array of starting points: Budva, Podgorica, Žabljak
+   - Export array of points: Budva, Podgorica, Žabljak
+   - Note: Same locations used for both starting AND ending points
 
 4. Define shared types in `src/types/index.ts`:
    - Location type
    - Activity type
-   - StartingPoint type
+   - StartingPoint type (also used for ending points)
+   - **DayTrip type** (single day itinerary)
+   - **MultiDayTrip type** (array of DayTrip)
    - TripConfig type
    - RouteResult type
+   - **DayTimeline type** (day-by-day breakdown, not hourly)
 
 ---
 
@@ -101,13 +114,14 @@ A one-page web app that allows tourists to:
 
 ### Phase 4: Route Engine (Core Logic) 🔥
 
-**Goal**: Implement the core route calculation logic.
+**Goal**: Implement the core route calculation logic for **day-based trips**.
 
 **Tasks**:
 1. Create `src/lib/routeEngine.ts`:
    - Pure TypeScript function (deterministic, testable)
    - **Input**:
      - Starting point
+     - **Ending point** (can be different from start)
      - Selected locations (array)
      - Selected activities (array)
      - Travel times between locations (injected from API)
@@ -115,16 +129,23 @@ A one-page web app that allows tourists to:
      - Total travel time
      - Total visit time
      - Total activity time
-     - Total trip duration
-     - `isValid` (boolean: ≤ 12 hours)
+     - Total trip duration (for the day)
+     - `isValid` (boolean: ≤ 10-12 hours per day)
      - Warnings array (if any)
-     - Timeline (hour-by-hour breakdown)
+     - **Day timeline** (major stops, not hour-by-hour)
+     - **Route order** (start → locations → end)
 
 2. Logic:
-   - Calculate total time = travel time + visit time + activity time
-   - Validate: total ≤ 12 hours
+   - Calculate total time = travel time (start → locations → end) + visit time + activity time
+   - Validate: total ≤ 10-12 hours (per day)
    - If invalid: generate warnings/suggestions
-   - Return structured result
+   - Return structured result for single day
+
+3. Create `src/lib/multiDayEngine.ts`:
+   - Handles multi-day trip logic
+   - Validates each day individually
+   - Ensures Day N ending point = Day N+1 starting point
+   - Calculates total pricing across all days
 
 3. Testing:
    - Write comprehensive test suite using Vitest
@@ -140,32 +161,43 @@ A one-page web app that allows tourists to:
 
 **Tasks**:
 1. Create `src/app/api/route-calc/route.ts`:
-   - Accept POST request with trip data:
+   - Accept POST request with **day trip data**:
      ```json
      {
+       "dayNumber": 1,
        "start": "Budva",
+       "end": "Podgorica",
        "locations": ["kotor", "perast"],
        "activities": ["rafting"],
        "passengers": 4
      }
      ```
    - Call Google Maps Distance Matrix API to get travel times
-   - Use `routeEngine` to calculate total duration
+   - Use `routeEngine` to calculate total duration for the day
    - Return JSON response:
      ```json
      {
-       "totalTime": 10.5,
+       "dayNumber": 1,
+       "totalTime": "10 hours",
        "valid": true,
        "warnings": [],
-       "timeline": [...],
-       "travelTime": 3.5,
-       "visitTime": 4.0,
-       "activityTime": 3.0
+       "timeline": [
+         {"type": "travel", "from": "Budva", "to": "Kotor", "duration": "1h"},
+         {"type": "visit", "location": "Kotor", "duration": "2h"},
+         {"type": "activity", "name": "Rafting", "duration": "4h"},
+         {"type": "travel", "from": "Kotor", "to": "Podgorica", "duration": "3h"}
+       ],
+       "travelTime": "4h",
+       "visitTime": "2h",
+       "activityTime": "4h"
      }
      ```
    - Handle errors properly (API failures, invalid input)
 
-2. Error handling:
+2. **Optional**: Create `src/app/api/multi-day-calc/route.ts`:
+   - Accept array of days
+   - Validate Day N end = Day N+1 start
+   - Return combined result for all days
    - Validate request body
    - Handle Google Maps API errors
    - Return proper HTTP status codes
@@ -234,57 +266,138 @@ A one-page web app that allows tourists to:
    - `src/components/trip/TripForm.tsx`:
      - Select number of passengers (1-8)
      - Select starting point (Budva, Podgorica, Žabljak)
+     - **Select ending point** (Budva, Podgorica, Žabljak)
      - Select activities (checkboxes)
+     - **Day indicator**: Show which day is being planned (Day 1, Day 2, etc.)
      - Display selected options
 
-3. Create timeline display:
-   - `src/components/trip/Timeline.tsx`:
-     - Display hour-by-hour breakdown
-     - Show travel time, visit time, activity time
-     - Visual timeline with icons
+3. **Create preview component (NEW)**:
+   - `src/components/trip/DayPreview.tsx`:
+     - Floating panel or sidebar
+     - Shows current day's planned route
+     - Selected locations for this day
+     - Route visualization preview
+     - Duration estimate
+     - Price for the day
+     - Actions:
+       - ✅ "Add This Day" button (confirms day)
+       - ✏️ "Modify" (adjust locations)
+       - 🗑️ "Discard" (clear day and start over)
 
-4. Create booking form:
+4. **Create multi-day summary (NEW)**:
+   - `src/components/trip/MultiDaySummary.tsx`:
+     - Shows all confirmed days
+     - Each day as collapsible card:
+       - Day number and route (e.g., "Day 1: Budva → Podgorica")
+       - Locations visited
+       - Duration and price
+       - Edit and Delete buttons
+     - "+ Add Another Day" button
+     - Total trip price across all days
+
+5. Create timeline display:
+   - `src/components/trip/DayTimeline.tsx`:
+     - **Day-by-day breakdown** (not hour-by-hour)
+     - Show travel path, visit stops, activity stops
+     - Visual timeline with icons:
+       - 🚗 Travel segments
+       - 📍 Visit locations  
+       - 🚣 Activities
+     - Collapsible per day (for multi-day trips)
+
+6. Create booking form:
    - `src/components/trip/BookingForm.tsx`:
      - Name, email, phone fields
-     - Date picker for trip date
+     - Date picker for **first day of trip**
      - Comments/notes textarea
      - Submit button
+     - Shows **all days** in booking request
 
-5. Main page integration:
+7. Main page integration:
    - `src/app/page.tsx`:
      - Layout: Form on left, Map on right
-     - State management for trip config
+     - **State management for multi-day trips**:
+       - `currentDay` (which day is being planned)
+       - `completedDays` (array of confirmed days)
+       - `currentDayConfig` (selections for day being planned)
      - Connect form to map (bidirectional)
+     - **Preview panel** shows live updates as user clicks map
+     - **Multi-day summary** shows all confirmed days
      - Submit button triggers API calls
      - Display results (timeline, price, warnings)
-     - Show "Send Request" button when valid
+     - Show "Send Request" button when at least 1 day is confirmed
 
-6. API integration:
+8. **Map interaction updates**:
+   - Color-code markers by day:
+     - Day 1: Blue markers
+     - Day 2: Green markers
+     - Day 3: Orange markers
+   - Show route lines color-coded by day
+   - Toggle to view specific day or all days
+   - Clear visual distinction between days
+
+9. API integration:
    - On submit:
-     1. Call `/api/route-calc` with trip data
-     2. Call `/api/pricing` with trip data
+     1. Call `/api/route-calc` for **each day**
+     2. Call `/api/pricing` for **each day** and calculate total
      3. Display loading state
      4. Show results or errors
    - Use React hooks (useState, useEffect)
    - Add loading spinners
    - Add error handling and messages
+   - **Multi-day validation**: Ensure Day N end = Day N+1 start
 
 ---
 
 ### Phase 8: Booking Request (Optional, for MVP)
 
-**Goal**: Allow users to submit booking requests.
+**Goal**: Allow users to submit **multi-day** booking requests.
 
 **Tasks**:
 1. Create `src/app/api/booking/route.ts`:
-   - Accept POST with booking data
+   - Accept POST with **multi-day** booking data:
+     ```json
+     {
+       "passengers": 4,
+       "contactInfo": {
+         "name": "Maria Schmidt",
+         "email": "maria@example.com",
+         "phone": "+49123456789"
+       },
+       "startDate": "2026-06-15",
+       "days": [
+         {
+           "dayNumber": 1,
+           "start": "Budva",
+           "end": "Podgorica",
+           "locations": ["kotor", "perast"],
+           "activities": ["rafting"],
+           "duration": "10 hours",
+           "price": 280
+         },
+         {
+           "dayNumber": 2,
+           "start": "Podgorica",
+           "end": "Žabljak",
+           "locations": ["skadar-lake", "ostrog"],
+           "activities": [],
+           "duration": "8 hours",
+           "price": 220
+         }
+       ],
+       "totalPrice": 500,
+       "notes": "Prefer morning departure"
+     }
+     ```
+   - Validate all days
    - Store in-memory (array) for now
-   - Return confirmation
+   - Return confirmation with booking ID
 
 2. Later (with DB):
-   - Create Prisma schema for bookings
+   - Create Prisma schema for multi-day bookings
    - Store in PostgreSQL
    - Add admin panel to view requests
+   - Email notifications
 
 ---
 
@@ -298,7 +411,9 @@ route-planner/
 │   │   ├── layout.tsx                # Root layout
 │   │   ├── api/
 │   │   │   ├── route-calc/
-│   │   │   │   └── route.ts          # Route calculation API
+│   │   │   │   └── route.ts          # Route calculation API (per day)
+│   │   │   ├── multi-day-calc/
+│   │   │   │   └── route.ts          # Multi-day validation API (optional)
 │   │   │   ├── pricing/
 │   │   │   │   └── route.ts          # Pricing API
 │   │   │   └── booking/
@@ -309,8 +424,10 @@ route-planner/
 │   │   │   ├── Map.tsx               # Google Maps component
 │   │   │   └── Marker.tsx            # Map markers
 │   │   ├── trip/
-│   │   │   ├── TripForm.tsx          # Trip setup form
-│   │   │   ├── Timeline.tsx          # Timeline display
+│   │   │   ├── TripForm.tsx          # Trip setup form (start/end points)
+│   │   │   ├── DayPreview.tsx        # Preview panel for current day
+│   │   │   ├── MultiDaySummary.tsx   # Summary of all confirmed days
+│   │   │   ├── DayTimeline.tsx       # Day-by-day timeline display
 │   │   │   └── BookingForm.tsx       # Booking form
 │   │   └── ui/
 │   │       ├── Button.tsx            # UI button
@@ -318,13 +435,14 @@ route-planner/
 │   │       ├── Card.tsx              # UI card
 │   │       └── Badge.tsx             # UI badge
 │   ├── lib/
-│   │   ├── routeEngine.ts            # Core route calculation logic
+│   │   ├── routeEngine.ts            # Core route calculation (single day)
+│   │   ├── multiDayEngine.ts         # Multi-day trip logic
 │   │   ├── pricingEngine.ts          # Pricing logic
 │   │   └── googleMaps.ts             # Google Maps helpers
 │   ├── data/
 │   │   ├── locations.ts              # Location data
 │   │   ├── activities.ts             # Activity data
-│   │   └── startingPoints.ts         # Starting points
+│   │   └── startingPoints.ts         # Starting/ending points
 │   ├── types/
 │   │   └── index.ts                  # Shared TypeScript types
 │   └── features/                     # (Future feature modules)
@@ -345,11 +463,17 @@ route-planner/
 ## ✅ Verification Checklist
 
 ### Manual Testing
-- [ ] Trip setup: Select passengers, starting point, activities
+- [ ] Trip setup: Select passengers, starting point, **ending point**, activities
 - [ ] Map: Select/deselect locations
-- [ ] Route calculation: Submit and see results
-- [ ] Validation: Try invalid routes (too long)
-- [ ] Pricing: Verify price calculation
+- [ ] **Preview**: See live preview as locations are selected
+- [ ] Route calculation: Submit and see results for one day
+- [ ] **Multi-day**: Add Day 2, verify Day 2 start = Day 1 end
+- [ ] **Multi-day summary**: View all confirmed days
+- [ ] Validation: Try invalid routes (too long for one day)
+- [ ] Pricing: Verify price calculation per day and total
+- [ ] **Day editing**: Edit or delete a previously confirmed day
+- [ ] Timeline: View day-by-day breakdown
+- [ ] Booking: Submit multi-day booking request
 - [ ] Timeline: View hour-by-hour breakdown
 - [ ] Booking: Submit booking request
 
@@ -361,12 +485,15 @@ route-planner/
 - [ ] Component tests for key UI components
 
 ### Edge Cases
-- [ ] No locations selected
-- [ ] Too many locations (> 12 hours)
+- [ ] No locations selected for a day
+- [ ] Too many locations for one day (> 10-12 hours)
 - [ ] Activities causing time overflow
 - [ ] Invalid starting point
+- [ ] **Ending point same as starting point** (round trip)
+- [ ] **Day 2 start ≠ Day 1 end** (should fail validation)
 - [ ] Google Maps API failure
 - [ ] Invalid passenger count
+- [ ] **Deleting Day 1 when Day 2, 3 exist** (should re-validate all days)
 
 ---
 
