@@ -7,19 +7,48 @@ A modern, scalable route planner for tourists in Montenegro, built with Next.js,
 ## 🎯 Core Idea
 
 A one-page web app that allows tourists to:
+- **Choose trip type**: One-day tour, Multi-day tour, or Full vacation tour
 - Plan **single-day or multi-day trips** in Montenegro
 - Select trip parameters (passengers, starting point, **ending point**, activities)
 - Build custom routes from predefined destinations via interactive map
+- **Choose specific dates** for each day (days can be non-consecutive)
 - See **live preview** of each day's itinerary
 - Ensure each day is feasible (≤ 10–12 hours)
-- Get price estimation per day and total
-- Submit booking request for entire trip
+- Get price estimation on final step (Step 3)
+- Submit booking request for entire trip OR special request for full vacation planning
+
+### Trip Type Options
+
+**1. One-Day Tour**:
+- Single day trip
+- Start and end points
+- See price and book immediately
+
+**2. Multi-Day Tour**:
+- Multiple day trips with different start/end points
+- **Non-consecutive dates allowed** (e.g., Day 1: Apr 20, Day 2: Apr 23, Day 3: Apr 25)
+- Day N can end in different city than it started
+- Day N+1 starts where Day N ended
+- Each day selected independently with specific date
+
+**3. Full Vacation Tour** (Special Request):
+- For complete vacation planning
+- Shows **attractive popup** with simple form:
+  - Vacation start date
+  - Vacation end date
+  - Number of passengers
+  - Phone number
+  - Email
+- Message: "We'll contact you privately to plan your perfect Montenegro vacation"
+- Bypasses normal planning flow
+- Goes directly to special request submission
 
 ### Multi-Day Trip Support
 - **Day trips**: Each day has a start point and end point
 - **Flexible routing**: Day 1 can end in a different city than it started
 - **Efficient planning**: Day 2 starts where Day 1 ended (no backtracking)
 - **Automatic progression**: Completing Day 1 automatically enables Day 2 planning
+- **Date flexibility**: Each day can be scheduled on any future date (non-consecutive)
 - **Visual preview**: See each day's route before confirming
 
 ---
@@ -61,13 +90,14 @@ A one-page web app that allows tourists to:
      - Lovcen National Park
 
 2. Create `src/data/activities.ts`:
-   - Export array of activity objects with: id, name, duration, price
+   - Export array of activity objects with: id, name, duration, price, **availableAt** (array of location IDs)
    - Example activities:
-     - Rafting (3-4 hours)
-     - Canyoning (4-5 hours)
-     - ATV tours (2-3 hours)
-     - Jeep tours (3-4 hours)
-     - Zipline (1-2 hours)
+     - Rafting (3-4 hours) - Available at: Tara Canyon, Moraca Canyon
+     - Canyoning (4-5 hours) - Available at: Nevidio Canyon
+     - ATV tours (2-3 hours) - Available at: Durmitor, Lovcen
+     - Jeep tours (3-4 hours) - Available at: Durmitor, Biogradska Gora
+     - Zipline (1-2 hours) - Available at: Tara Canyon
+   - **Key**: Each activity specifies which locations offer it
 
 3. Create `src/data/startingPoints.ts`:
    - Export array of points: Budva, Podgorica, Žabljak
@@ -75,10 +105,11 @@ A one-page web app that allows tourists to:
 
 4. Define shared types in `src/types/index.ts`:
    - Location type
-   - Activity type
+   - **Activity type** (includes `availableAt: string[]`)
    - StartingPoint type (also used for ending points)
    - **DayTrip type** (single day itinerary)
    - **MultiDayTrip type** (array of DayTrip)
+   - **SelectedActivity type** (activity + location where it's done)
    - TripConfig type
    - RouteResult type
    - **DayTimeline type** (day-by-day breakdown, not hourly)
@@ -104,11 +135,20 @@ A one-page web app that allows tourists to:
    - Render custom markers for locations
    - Handle click events
    - Show selected/unselected state
+   - **Show activity availability**:
+     - When an activity is selected, highlight markers that offer it
+     - Add badge/icon to markers showing available activities
+     - Visual distinction between regular and activity-offering locations
 
 4. Add selection logic:
    - Allow users to select/deselect markers
    - Store selected locations in React state
    - Visual feedback for selected locations
+   - **Activity filtering logic**:
+     - When activity selected: highlight compatible locations on map
+     - All locations remain visible
+     - Users can only perform activity at locations that offer it
+     - Show warning if activity selected but no compatible locations chosen
 
 ---
 
@@ -256,46 +296,74 @@ A one-page web app that allows tourists to:
 **Goal**: Build user interface and connect all components.
 
 **Tasks**:
-1. Create UI components:
+1. **Create trip type selector (NEW - Step 1)**:
+   - `src/components/trip/TripTypeSelector.tsx`:
+     - Three card options:
+       - "One-Day Tour" — single day planning
+       - "Multi-Day Tour" — multiple days with different start/end
+       - "Full Vacation Tour" — opens special popup
+     - Each card with icon, title, description
+     - Click selects mode or opens popup
+
+2. **Create full vacation popup (NEW)**:
+   - `src/components/trip/FullVacationPopup.tsx`:
+     - Attractive modal with Montenegro imagery
+     - Header: "Plan Your Perfect Montenegro Vacation"
+     - Form fields:
+       - Vacation start date (date picker)
+       - Vacation end date (date picker)
+       - Number of passengers (1-8)
+       - Phone number (with country code)
+       - Email
+     - CTA: "Request Vacation Planning"
+     - Submits special request (bypasses normal flow)
+
+3. Create UI components:
    - `src/components/ui/Button.tsx` — reusable button
    - `src/components/ui/Select.tsx` — dropdown select
    - `src/components/ui/Card.tsx` — card container
    - `src/components/ui/Badge.tsx` — badges for selected items
+   - `src/components/ui/DatePicker.tsx` — date selection
 
-2. Create trip setup form:
+4. Create trip configuration form:
    - `src/components/trip/TripForm.tsx`:
+     - **Date picker** for current day (allows non-consecutive dates)
      - Select number of passengers (1-8)
      - Select starting point (Budva, Podgorica, Žabljak)
      - **Select ending point** (Budva, Podgorica, Žabljak)
-     - Select activities (checkboxes)
-     - **Day indicator**: Show which day is being planned (Day 1, Day 2, etc.)
+     - **Select activities** (checkboxes):
+       - When activity selected, map highlights compatible locations
+       - Show count of compatible locations available
+       - Disable activity if no compatible locations exist
+     - **Day indicator**: Show which day is being planned (Day 1 (Apr 20), Day 2 (Apr 23), etc.)
      - Display selected options
 
-3. **Create preview component (NEW)**:
+5. **Create preview component (NEW - Step 2)**:
    - `src/components/trip/DayPreview.tsx`:
      - Floating panel or sidebar
      - Shows current day's planned route
+     - **Shows date** for this day
      - Selected locations for this day
      - Route visualization preview
      - Duration estimate
-     - Price for the day
+     - **NO PRICE** (price shown only in Step 3)
      - Actions:
-       - ✅ "Add This Day" button (confirms day)
+       - ✅ "Confirm This Day" button
        - ✏️ "Modify" (adjust locations)
        - 🗑️ "Discard" (clear day and start over)
 
-4. **Create multi-day summary (NEW)**:
+6. **Create multi-day summary (NEW)**:
    - `src/components/trip/MultiDaySummary.tsx`:
      - Shows all confirmed days
      - Each day as collapsible card:
-       - Day number and route (e.g., "Day 1: Budva → Podgorica")
+       - Day number, **date**, and route (e.g., "Day 1 (Apr 20): Budva → Podgorica")
        - Locations visited
-       - Duration and price
+       - Duration (**NO PRICE until Step 3**)
        - Edit and Delete buttons
      - "+ Add Another Day" button
-     - Total trip price across all days
+     - **Total price only shown in Step 3**
 
-5. Create timeline display:
+7. Create timeline display:
    - `src/components/trip/DayTimeline.tsx`:
      - **Day-by-day breakdown** (not hour-by-hour)
      - Show travel path, visit stops, activity stops
@@ -305,55 +373,95 @@ A one-page web app that allows tourists to:
        - 🚣 Activities
      - Collapsible per day (for multi-day trips)
 
-6. Create booking form:
+8. **Create price summary component (NEW - Step 3 only)**:
+   - `src/components/trip/PriceSummary.tsx`:
+     - Price breakdown per day
+     - Total price (prominent)
+     - Only rendered in Step 3
+     - Clean pricing table/card
+
+9. Create booking form:
    - `src/components/trip/BookingForm.tsx`:
+     - Shown only in **Step 3**
      - Name, email, phone fields
-     - Date picker for **first day of trip**
+     - **Not needed**: Date picker (dates already set per day)
      - Comments/notes textarea
      - Submit button
-     - Shows **all days** in booking request
+     - Shows summary of **all days** with dates
 
-7. Main page integration:
-   - `src/app/page.tsx`:
-     - Layout: Form on left, Map on right
-     - **State management for multi-day trips**:
-       - `currentDay` (which day is being planned)
-       - `completedDays` (array of confirmed days)
-       - `currentDayConfig` (selections for day being planned)
-     - Connect form to map (bidirectional)
-     - **Preview panel** shows live updates as user clicks map
-     - **Multi-day summary** shows all confirmed days
-     - Submit button triggers API calls
-     - Display results (timeline, price, warnings)
-     - Show "Send Request" button when at least 1 day is confirmed
+10. **Main page integration - 3-Step Flow**:
+    - `src/app/page.tsx`:
+    
+    **Step 1: Trip Type Selection**
+    - Show TripTypeSelector component
+    - Options: One-Day, Multi-Day, Full Vacation
+    - Full Vacation opens popup
+    - One-Day/Multi-Day proceed to Step 2
+    
+    **Step 2: Plan Days (NO PRICE)**
+    - Layout: Form on left, Map on right
+    - **State management**:
+      - `tripType` (one-day, multi-day, full-vacation)
+      - `currentDay` (which day is being planned)
+      - `completedDays` (array of confirmed days with dates)
+      - `currentDayConfig` (selections for day being planned)
+    - Show trip form (date, start/end, passengers, activities)
+    - **Preview panel** shows live updates (NO PRICE)
+    - **Multi-day summary** shows all confirmed days (NO PRICE)
+    - "Add Another Day" for multi-day mode
+    - "Continue to Booking" button (goes to Step 3)
+    
+    **Step 3: Price & Booking**
+    - Show all confirmed days with **dates**
+    - **NOW show price** (PriceSummary component)
+    - Show booking form
+    - Submit button sends booking request
 
-8. **Map interaction updates**:
-   - Color-code markers by day:
-     - Day 1: Blue markers
-     - Day 2: Green markers
-     - Day 3: Orange markers
-   - Show route lines color-coded by day
-   - Toggle to view specific day or all days
-   - Clear visual distinction between days
+11. **Map interaction updates**:
+    - **Activity availability visualization**:
+      - When activity selected: highlight/badge locations that offer it
+      - All locations remain visible (don't filter/hide)
+      - Visual indicators (badge, glow, special icon) for compatible locations
+      - Tooltip showing available activities per location
+    - **Multi-day color coding**:
+      - Day 1: Blue markers
+      - Day 2: Green markers
+      - Day 3: Orange markers
+    - Show route lines color-coded by day
+    - Toggle to view specific day or all days
+    - Clear visual distinction between days
 
-9. API integration:
-   - On submit:
-     1. Call `/api/route-calc` for **each day**
-     2. Call `/api/pricing` for **each day** and calculate total
-     3. Display loading state
-     4. Show results or errors
-   - Use React hooks (useState, useEffect)
-   - Add loading spinners
-   - Add error handling and messages
-   - **Multi-day validation**: Ensure Day N end = Day N+1 start
+12. **API integration (Step 3 only)**:
+    - When user clicks "Continue to Booking" (Step 2 → Step 3):
+      1. Call `/api/route-calc` for **each day**
+      2. Call `/api/pricing` for **each day** and calculate total
+      3. Display loading state
+      4. Show price breakdown in Step 3
+    - On booking submit (Step 3):
+      1. Validate all data
+      2. Submit to `/api/booking`
+      3. Show confirmation
+    - Use React hooks (useState, useEffect)
+    - Add loading spinners
+    - Add error handling and messages
+    - **Multi-day validation**: Ensure Day N end = Day N+1 start
+    
+13. **Full vacation tour flow**:
+    - Separate API endpoint: `/api/vacation-request`
+    - Store special requests separately
+    - Send confirmation email
+    - Admin notification
 
 ---
 
-### Phase 8: Booking Request (Optional, for MVP)
+### Phase 8: Booking & Special Requests
 
-**Goal**: Allow users to submit **multi-day** booking requests.
+**Goal**: Allow users to submit **multi-day** booking requests AND full vacation special requests.
 
 **Tasks**:
+
+**A. Regular Booking API**:
+
 1. Create `src/app/api/booking/route.ts`:
    - Accept POST with **multi-day** booking data:
      ```json
@@ -390,14 +498,41 @@ A one-page web app that allows tourists to:
      }
      ```
    - Validate all days
+   - Validate Day N end = Day N+1 start
    - Store in-memory (array) for now
    - Return confirmation with booking ID
 
-2. Later (with DB):
+**B. Full Vacation Request API**:
+
+2. Create `src/app/api/vacation-request/route.ts`:
+   - Accept POST with vacation request data:
+     ```json
+     {
+       "vacationStart": "2026-06-01",
+       "vacationEnd": "2026-06-14",
+       "passengers": 4,
+       "contactInfo": {
+         "phone": "+49123456789",
+         "email": "maria@example.com"
+       }
+     }
+     ```
+   - Store as special request (flagged differently from regular bookings)
+   - Send auto-reply email to customer
+   - Send admin notification
+   - Return confirmation message
+
+**C. Later Enhancements (with DB)**:
+
+3. Database schema:
    - Create Prisma schema for multi-day bookings
+   - Separate table for vacation special requests
    - Store in PostgreSQL
-   - Add admin panel to view requests
-   - Email notifications
+   
+4. Admin features:
+   - Admin panel to view and manage requests
+   - Email notifications with templates
+   - Status tracking (pending, confirmed, completed)
 
 ---
 
@@ -416,24 +551,30 @@ route-planner/
 │   │   │   │   └── route.ts          # Multi-day validation API (optional)
 │   │   │   ├── pricing/
 │   │   │   │   └── route.ts          # Pricing API
-│   │   │   └── booking/
-│   │   │       └── route.ts          # Booking API
+│   │   │   ├── booking/
+│   │   │   │   └── route.ts          # Regular booking API
+│   │   │   └── vacation-request/
+│   │   │       └── route.ts          # Full vacation special request API
 │   │   └── globals.css
 │   ├── components/
 │   │   ├── map/
 │   │   │   ├── Map.tsx               # Google Maps component
-│   │   │   └── Marker.tsx            # Map markers
+│   │   │   └── Marker.tsx            # Map markers (with activity badges)
 │   │   ├── trip/
-│   │   │   ├── TripForm.tsx          # Trip setup form (start/end points)
-│   │   │   ├── DayPreview.tsx        # Preview panel for current day
-│   │   │   ├── MultiDaySummary.tsx   # Summary of all confirmed days
+│   │   │   ├── TripTypeSelector.tsx  # Step 1: Choose trip type
+│   │   │   ├── FullVacationPopup.tsx # Special request popup
+│   │   │   ├── TripForm.tsx          # Trip setup form (with date picker)
+│   │   │   ├── DayPreview.tsx        # Live preview (no price)
+│   │   │   ├── MultiDaySummary.tsx   # All confirmed days summary
 │   │   │   ├── DayTimeline.tsx       # Day-by-day timeline display
-│   │   │   └── BookingForm.tsx       # Booking form
+│   │   │   ├── PriceSummary.tsx      # Price breakdown (Step 3 only)
+│   │   │   └── BookingForm.tsx       # Booking form (Step 3)
 │   │   └── ui/
 │   │       ├── Button.tsx            # UI button
 │   │       ├── Select.tsx            # UI select
 │   │       ├── Card.tsx              # UI card
-│   │       └── Badge.tsx             # UI badge
+│   │       ├── Badge.tsx             # UI badge
+│   │       └── DatePicker.tsx        # Date selection component
 │   ├── lib/
 │   │   ├── routeEngine.ts            # Core route calculation (single day)
 │   │   ├── multiDayEngine.ts         # Multi-day trip logic
@@ -441,7 +582,7 @@ route-planner/
 │   │   └── googleMaps.ts             # Google Maps helpers
 │   ├── data/
 │   │   ├── locations.ts              # Location data
-│   │   ├── activities.ts             # Activity data
+│   │   ├── activities.ts             # Activity data (with availableAt)
 │   │   └── startingPoints.ts         # Starting/ending points
 │   ├── types/
 │   │   └── index.ts                  # Shared TypeScript types
@@ -462,38 +603,73 @@ route-planner/
 
 ## ✅ Verification Checklist
 
-### Manual Testing
-- [ ] Trip setup: Select passengers, starting point, **ending point**, activities
-- [ ] Map: Select/deselect locations
-- [ ] **Preview**: See live preview as locations are selected
-- [ ] Route calculation: Submit and see results for one day
-- [ ] **Multi-day**: Add Day 2, verify Day 2 start = Day 1 end
-- [ ] **Multi-day summary**: View all confirmed days
-- [ ] Validation: Try invalid routes (too long for one day)
-- [ ] Pricing: Verify price calculation per day and total
-- [ ] **Day editing**: Edit or delete a previously confirmed day
-- [ ] Timeline: View day-by-day breakdown
-- [ ] Booking: Submit multi-day booking request
-- [ ] Timeline: View hour-by-hour breakdown
-- [ ] Booking: Submit booking request
+### Manual Testing - User Flow
+
+**Step 1: Trip Type Selection**
+- [ ] Three trip type options displayed correctly
+- [ ] Full Vacation popup opens and closes properly
+- [ ] Full Vacation form validation works
+- [ ] Full Vacation special request submits successfully
+
+**Step 2: Trip Planning (No Price)**
+- [ ] Trip form: Select passengers (1-8)
+- [ ] Trip form: Select starting point
+- [ ] Trip form: Select ending point
+- [ ] **Date picker**: Select date for current day
+- [ ] **Activities**: Select activity, verify compatible locations highlighted on map
+- [ ] **Activity badges**: Verify markers show activity availability
+- [ ] Map: Click to select/deselect locations
+- [ ] **Preview panel**: See live updates (route, duration, NO PRICE)
+- [ ] **Confirm day**: Add day to trip
+- [ ] **Multi-day summary**: View all confirmed days (with dates, NO PRICE)
+- [ ] **Non-consecutive dates**: Add Day 1 (Apr 20), Day 2 (Apr 23) — verify works
+- [ ] **Day editing**: Edit a previously confirmed day
+- [ ] **Day deletion**: Delete a day, verify subsequent days update
+- [ ] Validation: Try invalid route (>12 hours), see warnings
+
+**Step 3: Price & Booking**
+- [ ] **Price display**: Verify price appears for first time in Step 3
+- [ ] **Price breakdown**: Per-day and total prices shown
+- [ ] **Booking form**: Fill contact info
+- [ ] **Submit**: Successfully submit booking
+- [ ] **Confirmation**: See confirmation message
+
+**Multi-Day Specific**
+- [ ] Day 2 start point auto-fills from Day 1 end point
+- [ ] Can add multiple days (Day 3, Day 4, etc.)
+- [ ] Each day can have different date
+- [ ] Multi-day color coding on map (Day 1: blue, Day 2: green, etc.)
+- [ ] Route lines color-coded by day
 
 ### Automated Testing
-- [ ] Unit tests for `routeEngine`
+- [ ] Unit tests for `routeEngine` (single day)
+- [ ] Unit tests for `multiDayEngine` (cross-day validation)
 - [ ] Unit tests for `pricingEngine`
 - [ ] API tests for `/api/route-calc`
 - [ ] API tests for `/api/pricing`
-- [ ] Component tests for key UI components
+- [ ] API tests for `/api/booking`
+- [ ] API tests for `/api/vacation-request`
+- [ ] Component tests for TripTypeSelector
+- [ ] Component tests for DayPreview
+- [ ] Component tests for MultiDaySummary
 
 ### Edge Cases
 - [ ] No locations selected for a day
 - [ ] Too many locations for one day (> 10-12 hours)
 - [ ] Activities causing time overflow
+- [ ] **Activity selected but no compatible locations chosen** (should show warning)
+- [ ] **Select location that doesn't support selected activity** (should prevent or warn)
 - [ ] Invalid starting point
-- [ ] **Ending point same as starting point** (round trip)
+- [ ] **Ending point same as starting point** (round trip - should work)
 - [ ] **Day 2 start ≠ Day 1 end** (should fail validation)
+- [ ] **Past date selected** (should prevent or warn)
+- [ ] **Date conflicts** (Day 1 date = Day 2 date, should warn)
 - [ ] Google Maps API failure
-- [ ] Invalid passenger count
+- [ ] Invalid passenger count (0, negative, >8)
 - [ ] **Deleting Day 1 when Day 2, 3 exist** (should re-validate all days)
+- [ ] **Trying to book without confirming any days** (should prevent)
+- [ ] **Price calculation failure** (show error gracefully)
+- [ ] **Full vacation request with invalid dates** (end before start)
 
 ---
 
