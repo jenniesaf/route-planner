@@ -57,6 +57,10 @@ Create a modern, clean UI design for a **one-page web application** that helps t
   - ATV tours
   - Jeep tours
   - Zipline
+- **Activity-Location Connection**:
+  - When activity is checked, map highlights locations that offer it
+  - Show count of compatible locations (e.g., "Rafting available at 2 locations")
+  - Disable/gray out activity if no compatible locations available
 - Visual indication of time impact for each activity
 
 **Design Notes**:
@@ -80,13 +84,23 @@ Create a modern, clean UI design for a **one-page web application** that helps t
   - Perast
   - Bay of Kotor
   - Lovcen National Park
-- Selected vs unselected marker states
+  - Tara Canyon (rafting/zipline)
+  - Nevidio Canyon (canyoning)
+- **Activity-aware markers**:
+  - Base state: Regular marker
+  - Selected state: Different color/size/animation
+  - **Activity available state**: Badge/icon showing available activities
+  - **Highlighted state**: When activity is selected, compatible locations glow/highlight
+  - Tooltip on hover showing available activities
 - Route line connecting selected locations
 - Zoom controls
 
 **Design Notes**:
 - Markers should be clear and clickable
 - Selected markers should have distinct visual state (e.g., different color, larger, with animation)
+- **Activity badges**: Small icons (e.g., 🚣 for rafting, 🙵 for ATV) on/near markers
+- **Activity highlight**: When user selects "Rafting", Tara Canyon marker glows or gets special border
+- All locations remain visible even when activity selected (no hiding)
 - Route line should be prominent but not overwhelming
 
 ---
@@ -325,15 +339,21 @@ Create these as base components (Shadcn/UI style):
 ### Step 2: User Configures Trip
 - Select passengers
 - Select starting point
-- Select optional activities
+- **Select optional activities**:
+  - When activity is checked, map immediately highlights compatible locations
+  - Example: Check "Rafting" → Tara Canyon marker gets highlighted/badge
+  - All markers remain visible (no filtering)
+  - Activity counter shows "Available at X locations"
 - Map highlights starting point
 
 ### Step 3: User Selects Locations
-- Click markers on map
+- Click markers on map (including those offering selected activities)
 - Selected locations appear in list
+- **If activity was selected**: Activity automatically assigned to compatible location
 - Timeline updates in real-time
 - Price updates in real-time
 - Validation runs (show if valid/invalid)
+- Warning if activity selected but no compatible location chosen
 
 ### Step 4: Review & Adjust
 - View timeline
@@ -429,21 +449,27 @@ Create these as base components (Shadcn/UI style):
 1. Opens app, sees clean interface
 2. Selects "4 passengers" from dropdown
 3. Selects "Budva" as starting point
-4. Checks "Rafting" activity (sees it adds 3-4 hours)
-5. Clicks markers on map: Kotor, Perast
+4. **Checks "Rafting" activity**:
+   - Map immediately highlights Tara Canyon (offers rafting)
+   - Other locations remain visible but not highlighted
+   - Shows "Rafting available at 1 location"
+5. Clicks markers on map: Kotor, Perast, **Tara Canyon**
 6. Sees timeline update: 
    - 9:00 AM - Depart Budva
    - 9:45 AM - Arrive Kotor (visit: 2 hours)
-   - 12:00 PM - Rafting activity (4 hours)
-   - 4:30 PM - Arrive Perast (visit: 1.5 hours)
-   - 6:15 PM - Return to Budva
-   - **Total: 9.25 hours ✅**
-7. Sees price: €280
+   - 12:00 PM - Travel to Tara Canyon
+   - 1:00 PM - **Rafting activity at Tara Canyon** (4 hours)
+   - 5:30 PM - Travel to Perast (visit: 1.5 hours)
+   - 7:15 PM - Return to Budva
+   - **Total: 10.25 hours ✅**
+7. Sees price: €320
 8. Fills booking form
 9. Clicks "Send Request"
 10. Gets confirmation
 
 **The design should make this flow intuitive and pleasant.**
+
+**Note**: The activity-location connection should be visually clear — when Maria checks "Rafting", she should immediately see which locations offer it.
 
 ---
 
