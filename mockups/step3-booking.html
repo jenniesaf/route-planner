@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Montenegro Route Planner - Booking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+        
+        .progress-bar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .progress-step.active {
+            color: #1E40AF;
+            font-weight: 600;
+        }
+        
+        .progress-step.completed {
+            color: #10B981;
+        }
+        
+        .main-container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        
+        .panel-header {
+            padding: 1.5rem;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .panel-header h2 {
+            color: #1e293b;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .panel-body {
+            padding: 1.5rem;
+        }
+        
+        .day-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        
+        .day-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .day-title {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 1.05rem;
+        }
+        
+        .day-route {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        .edit-btn {
+            background: none;
+            border: 1px solid #cbd5e1;
+            color: #64748b;
+            padding: 0.375rem 0.875rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .edit-btn:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+        
+        .route-list {
+            margin-top: 0.75rem;
+            padding-left: 1rem;
+        }
+        
+        .route-list li {
+            color: #475569;
+            font-size: 0.9rem;
+            margin-bottom: 0.375rem;
+        }
+        
+        .day-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .day-stat {
+            font-size: 0.875rem;
+        }
+        
+        .day-stat-label {
+            color: #64748b;
+        }
+        
+        .day-stat-value {
+            color: #1e293b;
+            font-weight: 600;
+        }
+        
+        .price-value {
+            color: #10B981;
+            font-size: 1.15rem;
+        }
+        
+        .summary-totals {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-top: 1.5rem;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            color: #475569;
+        }
+        
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            border-top: 2px solid #cbd5e1;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .total-price {
+            color: #10B981;
+        }
+        
+        .price-table {
+            margin-bottom: 1.5rem;
+        }
+        
+        .price-section {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .price-section:last-of-type {
+            border-bottom: 2px solid #cbd5e1;
+        }
+        
+        .price-section-title {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
+        }
+        
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            color: #475569;
+            font-size: 0.95rem;
+        }
+        
+        .price-row-dots {
+            flex: 1;
+            border-bottom: 1px dotted #cbd5e1;
+            margin: 0 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #1e293b;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1E40AF;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            color: #475569;
+            font-weight: normal;
+        }
+        
+        .checkbox-label input {
+            width: auto;
+            cursor: pointer;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: #10B981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1.05rem;
+            transition: background 0.3s;
+            margin-top: 1rem;
+        }
+        
+        .btn:hover {
+            background: #059669;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+            padding: 0.75rem;
+            font-size: 0.95rem;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+        
+        .payment-badge {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            text-align: center;
+            color: #1e40af;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-step completed">Step 1: Trip Type ✓</div>
+        <span>→</span>
+        <div class="progress-step completed">Step 2: Plan Days ✓</div>
+        <span>→</span>
+        <div class="progress-step active">Step 3: Booking ✅</div>
+    </div>
+    
+    <div class="main-container">
+        <!-- Left Panel: Trip Summary -->
+        <div class="panel">
+            <div class="panel-header">
+                <h2>📋 Your Trip Summary</h2>
+            </div>
+            <div class="panel-body">
+                <div class="day-card">
+                    <div class="day-card-header">
+                        <div>
+                            <div class="day-title">Day 1 (April 20)</div>
+                            <div class="day-route">Budva → Podgorica</div>
+                        </div>
+                        <button class="edit-btn">Edit</button>
+                    </div>
+                    
+                    <div>
+                        <strong style="font-size: 0.875rem; color: #64748b;">Route:</strong>
+                        <ul class="route-list">
+                            <li>Kotor Old Town (2h)</li>
+                            <li>Rafting at Tara Canyon (4h)</li>
+                            <li>Perast (1.5h)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="day-stats">
+                        <div class="day-stat">
+                            <span class="day-stat-label">Duration:</span>
+                            <span class="day-stat-value">11.5 hours</span>
+                        </div>
+                        <div class="day-stat">
+                            <span class="day-stat-label">Price:</span>
+                            <span class="price-value">€360</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="day-card">
+                    <div class="day-card-header">
+                        <div>
+                            <div class="day-title">Day 2 (April 23)</div>
+                            <div class="day-route">Podgorica → Žabljak</div>
+                        </div>
+                        <button class="edit-btn">Edit</button>
+                    </div>
+                    
+                    <div>
+                        <strong style="font-size: 0.875rem; color: #64748b;">Route:</strong>
+                        <ul class="route-list">
+                            <li>Skadar Lake (2h)</li>
+                            <li>Ostrog Monastery (3h)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="day-stats">
+                        <div class="day-stat">
+                            <span class="day-stat-label">Duration:</span>
+                            <span class="day-stat-value">9 hours</span>
+                        </div>
+                        <div class="day-stat">
+                            <span class="day-stat-label">Price:</span>
+                            <span class="price-value">€275</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-totals">
+                    <div class="summary-row">
+                        <span>Total Days:</span>
+                        <span style="font-weight: 600;">2 days</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Total Passengers:</span>
+                        <span style="font-weight: 600;">4 passengers</span>
+                    </div>
+                    <div class="summary-total">
+                        <span>Total Price:</span>
+                        <span class="total-price">€635</span>
+                    </div>
+                </div>
+                
+                <button class="btn btn-secondary" onclick="window.location.href='step2-plan-day.html'">
+                    ← Edit Days
+                </button>
+            </div>
+        </div>
+        
+        <!-- Right Panel: Price & Booking -->
+        <div>
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>💰 Price Breakdown</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="price-table">
+                        <div class="price-section">
+                            <div class="price-section-title">Day 1 (April 20)</div>
+                            <div class="price-row">
+                                <span>Base price</span>
+                                <div class="price-row-dots"></div>
+                                <span>€100</span>
+                            </div>
+                            <div class="price-row">
+                                <span>Distance (120 km)</span>
+                                <div class="price-row-dots"></div>
+                                <span>€120</span>
+                            </div>
+                            <div class="price-row">
+                                <span>4 passengers</span>
+                                <div class="price-row-dots"></div>
+                                <span>€80</span>
+                            </div>
+                            <div class="price-row">
+                                <span>Rafting activity</span>
+                                <div class="price-row-dots"></div>
+                                <span>€60</span>
+                            </div>
+                            <div class="price-row" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e2e8f0; font-weight: 600;">
+                                <span>Day 1 Total</span>
+                                <div class="price-row-dots"></div>
+                                <span style="color: #10B981;">€360</span>
+                            </div>
+                        </div>
+                        
+                        <div class="price-section">
+                            <div class="price-section-title">Day 2 (April 23)</div>
+                            <div class="price-row">
+                                <span>Base price</span>
+                                <div class="price-row-dots"></div>
+                                <span>€100</span>
+                            </div>
+                            <div class="price-row">
+                                <span>Distance (95 km)</span>
+                                <div class="price-row-dots"></div>
+                                <span>€95</span>
+                            </div>
+                            <div class="price-row">
+                                <span>4 passengers</span>
+                                <div class="price-row-dots"></div>
+                                <span>€80</span>
+                            </div>
+                            <div class="price-row" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid #e2e8f0; font-weight: 600;">
+                                <span>Day 2 Total</span>
+                                <div class="price-row-dots"></div>
+                                <span style="color: #10B981;">€275</span>
+                            </div>
+                        </div>
+                        
+                        <div class="price-row" style="font-size: 1.25rem; font-weight: 600; padding: 1rem 0; margin-top: 0.5rem;">
+                            <span>TOTAL PRICE</span>
+                            <div class="price-row-dots"></div>
+                            <span style="color: #10B981;">€635</span>
+                        </div>
+                    </div>
+                    
+                    <div class="payment-badge">
+                        💳 Payment at pickup
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel" style="margin-top: 2rem;">
+                <div class="panel-header">
+                    <h2>📝 Booking Information</h2>
+                </div>
+                <div class="panel-body">
+                    <form onsubmit="submitBooking(event)">
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input type="text" placeholder="Maria Schmidt" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Email Address *</label>
+                            <input type="email" placeholder="maria@example.com" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Phone Number *</label>
+                            <input type="tel" placeholder="+49 123 456 789" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Additional Notes (Optional)</label>
+                            <textarea placeholder="Any special requests or preferences..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" required>
+                                I accept the terms and conditions
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn">
+                            Submit Booking Request
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function submitBooking(event) {
+            event.preventDefault();
+            alert('🎉 Booking Submitted!\n\nThank you for booking with Montenegro Route Planner.\n\nYou will receive a confirmation email shortly with all the details for your 2-day adventure!\n\nTotal: €635\nDays: April 20 & 23, 2026');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
