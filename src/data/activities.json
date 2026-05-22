@@ -1,0 +1,146 @@
+[
+  {
+    "id": "ziplineBudva",
+    "name": "Zipline above Budva",
+    "duration": "",
+    "availableAt": ["skadarLake"]
+  },
+  {
+    "id": "karting",
+    "name": "Karting Center",
+    "duration": "",
+    "availableAt": ["skadarLake"]
+  },
+  {
+    "id": "atvKolasin",
+    "name": "ATV Tour",
+    "duration": "2 hours",
+    "availableAt": ["Budva", "Podgorica" ]
+  },
+  {
+    "id": "atvZabljak",
+    "name": "ATV Tour",
+    "duration": "1 hours",
+    "availableAt": ["Budva", "Podgorica"]
+  },
+  {
+    "id": "jeepKolasin",
+    "name": "Tara Bridge",
+    "duration": "1 hour",
+    "availableAt": ["Budva", "Podgorica"]
+  },
+  {
+    "id": "jeepZabljak",
+    "name": "Tara Bridge",
+    "duration": "1 hour",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["tara-bridge"]
+  },
+  {
+    "id": "horseRidingTrsa",
+    "name": "Tara Bridge",
+    "duration": "1 hour",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["tara-bridge"]
+  },
+  {
+    "id": "horseRidingKolasin",
+    "name": "Tara Bridge",
+    "duration": "1 hour",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["tara-bridge"]
+  },
+  
+  {
+    "id": "ziplineTara",
+    "name": "Tara Bridge",
+    "duration": "1 hour",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["tara-bridge"]
+  },
+  {
+    "id": "ziplinePiva",
+    "name": "Tara Bridge",
+    "duration": "1 hour",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["tara-bridge"]
+  },
+  {
+    "id": "raftingTara",
+    "name": "Piva Rafting",
+    "duration": "3 hours",
+    "availableAt": ["Podgorica"],
+    "compatibleLocations": ["piva-rafting"]
+  },
+  {
+    "id": "raftingPiva",
+    "name": "Piva Rafting",
+    "duration": "3 hours",
+    "availableAt": ["Podgorica"],
+    "compatibleLocations": ["piva-rafting"]
+  },
+  {
+    "id": "hiking",
+    "name": "Durmitor Ring",
+    "duration": "4 hours",
+    "availableAt": ["Podgorica"],
+    "compatibleLocations": ["durmitor-ring"]
+  },
+  {
+    "id": "boatSkadar",
+    "name": "Skadar Lake Boat Tour",
+    "duration": "2 hours",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["skadar-lake-skadar-lake"]
+  },
+  {
+    "id": "boatPiva",
+    "name": "Skadar Lake Boat Tour",
+    "duration": "2 hours",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["skadar-lake-skadar-lake"]
+  },
+  {
+    "id": "boatKotor",
+    "name": "Skadar Lake Boat Tour",
+    "duration": "2 hours",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["skadar-lake-skadar-lake"]
+  },
+  {
+    "id": "boatBlueCave",
+    "name": "Skadar Lake Boat Tour",
+    "duration": "2 hours",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["skadar-lake-skadar-lake"]
+  },
+  {
+    "id": "kanyoning",
+    "name": "Skadar Lake Boat Tour",
+    "duration": "2 hours",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["skadar-lake-skadar-lake"]
+  },
+  {
+    "id": "vrGame",
+    "name": "Skadar Lake Boat Tour",
+    "duration": "2 hours",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["skadar-lake-skadar-lake"]
+  },
+  {
+    "id": "lazerGame",
+    "name": "Skadar Lake Boat Tour",
+    "duration": "2 hours",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["skadar-lake-skadar-lake"]
+  },
+  {
+    "id": "paintBall",
+    "name": "Skadar Lake Boat Tour",
+    "duration": "2 hours",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["skadar-lake-skadar-lake"]
+  }
+
+]

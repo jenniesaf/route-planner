@@ -1,0 +1,226 @@
+[
+  {
+    "id": "skadarLake",
+    "name": "Skadar Lake National Park",
+    "lat": 43.148274,
+    "lng": 19.097811,
+    "availableActivities": ["ziplineBudva", "Hiking", "Boat Tour", "Karting", "Shopping"],
+    "startingPoint": ["Budva", "Podgorica"],
+    "endingPoint": ["Budva", "Podgorica", "Tivat"],
+    "route": [
+      {
+        "id" : "svetiStefanViewpoint",
+        "name": "Sveti Stefan Viewpoint"
+      },
+       {
+        "id" :"skadarLakeBoatTour",
+        "name": "Skadar Lake Boat Tour"
+      },
+       {
+        "id" :"niagaraWaterfall)",
+        "name": "Niagara Waterfall (depends on the season)"
+      },
+      {
+        "id": "choice-stop",
+        "name": "Choose Your Own Adventure Stop",
+        "type": "choice",
+        "options": [
+          {
+            "id": "ziplineBudva",
+            "name": "Zipline above Budva"
+          },
+          {
+            "id": "karting",
+            "name": "Karting Center"
+          },
+          {
+            "id": "big",
+            "name": "BIG Fashion Mall"
+          },
+          {
+            "id": "pavlova",
+            "name": "Pavlova Strana Viewpoint"
+          }
+        ]
+      }
+    ] 
+  },
+{
+    "id": "rafting-tara",
+    "name": "Rafting Tara Bridge",
+    "lat": 43.150366, 
+    "lng": 19.295263,
+    "availableActivities": ["Zipline", "Rafting"],
+    "recommended": true,
+    "startingPoint": ["Budva", "Podgorica"],
+    "endingPoint": ["Budva", "Podgorica", "Tivat"]
+  },
+{
+    "id": "black-lake",
+    "name": "Black Lake",
+    "lat": 43.150366, 
+    "lng": 19.295263,
+    "availableActivities": ["Zipline", "Rafting"],
+    "recommended": true,
+    "startingPoint": ["Budva", "Podgorica"],
+    "endingPoint": ["Budva", "Podgorica", "Tivat"]
+  },
+{
+    "id": "durmitor-ring",
+    "name": "Durmitor Ring",
+    "lat": 43.134251, 
+    "lng": 18.973024,
+    "availableActivities": ["Zipline", "Horse Riding", "Hiking"],
+    "recommended": true,
+    "startingPoint": "Podgorica",
+    "endingPoint": ["Podgorica", "Tivat"],
+            "route": [
+      {
+        "id" : "sveti-stefan-viewpoint",
+        "name": "Sveti Stefan Viewpoint"
+      },
+       {
+        "id" :"skadar-lake-boat-tour",
+        "name": "Skadar Lake Boat Tour"
+      },
+       {
+        "id" :"niagara-waterfall)",
+        "name": "Niagara Waterfall (depends on the season)"
+      },
+       {
+        "id": "choice-stop",
+        "name": "Choose Your Own Adventure Stop",
+        "type": "choice",
+        "options": [
+          {
+            "id": "karting-center",
+            "name": "Karting Center"
+          },
+          {
+            "id": "big-fashion-mall",
+            "name": "BIG Fashion Mall"
+          },
+          {
+            "id": "pavlova-strana",
+            "name": "Pavlova Strana Viewpoint"
+          }
+        ]
+      }
+    ] 
+  },
+{
+    "id": "piva-rafting",
+    "name": "Piva Rafting",
+    "lat": 43.344462, 
+    "lng": 18.840990,
+    "availableActivities": ["Rafting"],
+    "recommended": true,
+    "startingPoint": ["Podgorica"],
+    "endingPoint": ["Podgorica", "Tivat"],
+            "route": [
+      {
+        "id" : "sveti-stefan-viewpoint",
+        "name": "Sveti Stefan Viewpoint"
+      },
+       {
+        "id" :"skadar-lake-boat-tour",
+        "name": "Skadar Lake Boat Tour"
+      },
+       {
+        "id" :"niagara-waterfall)",
+        "name": "Niagara Waterfall (depends on the season)"
+      },
+       {
+        "id": "choice-stop",
+        "name": "Choose Your Own Adventure Stop",
+        "type": "choice",
+        "options": [
+          {
+            "id": "karting-center",
+            "name": "Karting Center"
+          },
+          {
+            "id": "big-fashion-mall",
+            "name": "BIG Fashion Mall"
+          },
+          {
+            "id": "pavlova-strana",
+            "name": "Pavlova Strana Viewpoint"
+          }
+        ]
+      }
+    ] 
+  },
+ {
+    "id": "biograd-lake",
+    "name": "Biograd Lake",
+    "lat": 42.901099,
+    "lng": 19.595727,
+    "availableActivities":"",
+    "recommended": true,
+    "startingPoint": ["Budva", "Podgorica"],
+    "endingPoint": ["Budva", "Podgorica"],
+      "route": [
+      {
+        "id" : "sveti-stefan-viewpoint",
+        "name": "Sveti Stefan Viewpoint"
+      },
+       {
+        "id" :"moraca-kanyon",
+        "name": "Moraca Kanyon"
+      },
+       {
+        "id" :"biograd-lake",
+        "name": "Biograd Lake"
+      },
+       {
+        "id": "ribnjak-verusa",
+        "name": "National Authentic Restaurant (from Podgorica only)"
+      }
+    ] 
+  },
+   {
+    "id": "skadar-lake-skadar-lake",
+    "name": "Skadar Lake",
+    "lat": 42.279873, 
+    "lng": 19.134755,
+    "availableActivities":["Boat Tour", "Hiking", "Zipline", "Karting", "Shopping"],
+    "recommended": true,
+    "startingPoint": ["Budva", "Podgorica"],
+    "endingPoint": ["Budva", "Podgorica"],
+    "route": [
+      {
+        "id" : "sveti-stefan-viewpoint",
+        "name": "Sveti Stefan Viewpoint"
+      },
+       {
+        "id" :"skadar-lake-boat-tour",
+        "name": "Skadar Lake Boat Tour"
+      },
+       {
+        "id" :"niagara-waterfall)",
+        "name": "Niagara Waterfall (depends on the season)"
+      },
+       {
+        "id": "choice-stop",
+        "name": "Choose Your Own Adventure Stop",
+        "type": "choice",
+        "options": [
+          {
+            "id": "karting-center",
+            "name": "Karting Center"
+          },
+          {
+            "id": "big-fashion-mall",
+            "name": "BIG Fashion Mall"
+          },
+          {
+            "id": "pavlova-strana",
+            "name": "Pavlova Strana Viewpoint"
+          }
+        ]
+    }
+  ] 
+    
+  }
+]
