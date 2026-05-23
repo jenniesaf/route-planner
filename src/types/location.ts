@@ -1,10 +1,11 @@
-import { ActivityId } from "./activities";
+import { Activity } from "./activities";
 
 export type RouteStop = {
   id: string;
   name: string;
   type?: string;
-  options?: { id: string; name: string | ActivityId }[];
+  //options?: string[];
+  options?: { id: string; name: string | Activity }[];
 };
 
 export type Location = {
@@ -12,7 +13,7 @@ export type Location = {
   name: string
   lat: number
   lng: number
-  availableActivities: ActivityId[] | ActivityId
+  availableActivities: Activity['id'][]
   recommended?: boolean
   startingPoint?: string[] | string
   endingPoint?: string[] | string

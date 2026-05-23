@@ -9,7 +9,14 @@
     "id": "karting",
     "name": "Karting Center",
     "duration": "",
-    "availableAt": ["skadarLake"]
+    "availableAt": "skadarLake"
+  },
+  {
+    "id": "ziplineTara",
+    "name": "Tara Bridge",
+    "duration": "1 hour",
+    "availableAt": ["Budva", "Podgorica"],
+    "compatibleLocations": ["tara-bridge"]
   },
   {
     "id": "atvKolasin",
@@ -51,13 +58,6 @@
     "compatibleLocations": ["tara-bridge"]
   },
   
-  {
-    "id": "ziplineTara",
-    "name": "Tara Bridge",
-    "duration": "1 hour",
-    "availableAt": ["Budva", "Podgorica"],
-    "compatibleLocations": ["tara-bridge"]
-  },
   {
     "id": "ziplinePiva",
     "name": "Tara Bridge",

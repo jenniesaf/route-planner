@@ -6,4 +6,3 @@ export type Activity = {
   duration?: string
   availableAt: LocationId[] | LocationId
 }
-export type ActivityId = Activity['id']

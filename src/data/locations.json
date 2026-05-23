@@ -2,8 +2,8 @@
   {
     "id": "skadarLake",
     "name": "Skadar Lake National Park",
-    "lat": 43.148274,
-    "lng": 19.097811,
+   "lat": 42.279873, 
+    "lng": 19.134755,
     "availableActivities": ["ziplineBudva", "Hiking", "Boat Tour", "Karting", "Shopping"],
     "startingPoint": ["Budva", "Podgorica"],
     "endingPoint": ["Budva", "Podgorica", "Tivat"],
@@ -22,16 +22,14 @@
       },
       {
         "id": "choice-stop",
-        "name": "Choose Your Own Adventure Stop",
+        "name": "stop to choose",
         "type": "choice",
         "options": [
           {
-            "id": "ziplineBudva",
-            "name": "Zipline above Budva"
+            "id": "ziplineBudva"
           },
           {
-            "id": "karting",
-            "name": "Karting Center"
+            "id": "karting"
           },
           {
             "id": "big",
@@ -50,7 +48,7 @@
     "name": "Rafting Tara Bridge",
     "lat": 43.150366, 
     "lng": 19.295263,
-    "availableActivities": ["Zipline", "Rafting"],
+    "availableActivities": ["ziplineTara", "Rafting"],
     "recommended": true,
     "startingPoint": ["Budva", "Podgorica"],
     "endingPoint": ["Budva", "Podgorica", "Tivat"]
@@ -89,7 +87,7 @@
       },
        {
         "id": "choice-stop",
-        "name": "Choose Your Own Adventure Stop",
+        "name": "stop to choose",
         "type": "choice",
         "options": [
           {
@@ -132,7 +130,7 @@
       },
        {
         "id": "choice-stop",
-        "name": "Choose Your Own Adventure Stop",
+        "name": "stop to choose",
         "type": "choice",
         "options": [
           {
@@ -183,7 +181,7 @@
     "id": "skadar-lake-skadar-lake",
     "name": "Skadar Lake",
     "lat": 42.279873, 
-    "lng": 19.134755,
+    "lng": 20.134755,
     "availableActivities":["Boat Tour", "Hiking", "Zipline", "Karting", "Shopping"],
     "recommended": true,
     "startingPoint": ["Budva", "Podgorica"],
@@ -203,7 +201,7 @@
       },
        {
         "id": "choice-stop",
-        "name": "Choose Your Own Adventure Stop",
+        "name": "stop to choose",
         "type": "choice",
         "options": [
           {
